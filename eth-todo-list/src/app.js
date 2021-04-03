@@ -24,7 +24,9 @@ App = {
     },
 
     loadAccount: async () => {
-        App.account = await ethereum.request({ method: 'eth_requestAccounts' });
+        const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
+        App.account = accounts[0];
+        console.log("Accounts", accounts);
         console.log("Account", App.account);
     },
 
@@ -76,7 +78,7 @@ App = {
 
             // put the task in the correct list
             if (taskCompleted) {
-                $('#compleyedTaskList').append($newTaskTemplate);
+                $('#completedTaskList').append($newTaskTemplate);
             } else {
                 $('#taskList').append($newTaskTemplate);
             }
@@ -84,6 +86,13 @@ App = {
             $newTaskTemplate.show();
         }
     },
+
+    createTask: async () => {
+        App.setLoading(true)
+        const content = $('#newTask').val()
+        await App.todoList.createTask(content)
+        window.location.reload()
+      },
 
     setLoading: (boolean) => {
         App.loading = boolean
