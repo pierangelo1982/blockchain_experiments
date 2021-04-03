@@ -40,3 +40,5 @@ truffle(development)>
 
 task = await todoList.tasks(1)
 
+
+truffle test
