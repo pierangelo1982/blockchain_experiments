@@ -35,7 +35,8 @@ App = {
         App.contracts.TodoList.setProvider(App.provider);
         console.log("todoList:", todoList);
 
-        App.todoList = await App.contracts.deployed;
+        // Hydrate the smart contract with values from the blockchain
+        App.todoList = await App.contracts.TodoList.deployed()
         console.log("todolist deployed", App.todoList);
     },
 
@@ -49,9 +50,39 @@ App = {
       // Render Account
       $('#account').html(App.account)
       // Render Tasks
-      //await App.renderTasks()
+      await App.renderTasks()
       // Update loading state
       App.setLoading(false)
+    },
+
+    renderTasks: async () => {
+        // load total task count from the blockchain
+        const taskCount = await App.todoList.taskCount();
+        const $taskTemplate = $('.taskTemplate');
+
+        // render out each task with a new task template
+        for (var i = 1; i <= taskCount; i++) {
+            const task = await App.todoList.tasks(i);
+            const taskId = task[0].toNumber();
+            const taskContent = task[1];
+            const taskCompleted = task[2];
+
+            const $newTaskTemplate = $taskTemplate.clone()
+            $newTaskTemplate.find('.content').html(taskContent);
+            $newTaskTemplate.find('input')
+                            .prop('name', taskId)
+                            .prop('checked', taskCompleted)
+                            .on('click', App.toggleCompleted);
+
+            // put the task in the correct list
+            if (taskCompleted) {
+                $('#compleyedTaskList').append($newTaskTemplate);
+            } else {
+                $('#taskList').append($newTaskTemplate);
+            }
+            // show the task
+            $newTaskTemplate.show();
+        }
     },
 
     setLoading: (boolean) => {
