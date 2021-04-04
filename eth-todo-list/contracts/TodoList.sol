@@ -17,6 +17,11 @@ contract TodoList {
         bool completed
     );
 
+    event TaskCompleted(
+        uint id,
+        bool completed
+    );
+
     constructor() public {
         createTask("Prova a fare una blockchain");
     }
@@ -27,6 +32,13 @@ contract TodoList {
         emit TaskCreated(taskCount, _content, false);
     }
 
+    function toggleCompleted(uint _id) public {
+        // convenzione per metetre le variabili locali _
+        Task memory _task = tasks[_id];
+        _task.completed = !_task.completed;
+        tasks[_id] = _task;
+        emit TaskCompleted(_id, _task.completed);
+    }
 }
 
 
